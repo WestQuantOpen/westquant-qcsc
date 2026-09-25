@@ -1,2 +1,0 @@
-[console_scripts]
-westquant = qcsc.cli:main
