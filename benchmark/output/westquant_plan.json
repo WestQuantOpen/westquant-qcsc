@@ -1,0 +1,241 @@
+{
+  "schema_version": "wq-qcsc-plan-v0.1",
+  "plans": [
+    {
+      "name": "SAFE",
+      "description": "Only EXACT transformations. Mathematical result preserved.",
+      "recommendations": [
+        {
+          "transformation_id": "T08",
+          "transformation_name": "Repeated-Circuit Caching",
+          "guarantee_class": "exact",
+          "confidence": "low",
+          "what_detected": "Loops detected that may resubmit identical circuits",
+          "why_expensive": "Identical circuits submitted multiple times to QPU",
+          "alternative": "Cache results for identical circuit+parameter combinations",
+          "estimated_qpu_saving": "Eliminates redundant QPU submissions entirely",
+          "required_local_compute": "Hash storage for circuit+parameter keys",
+          "expected_quality_risk": "None \u2014 cached results are identical",
+          "validation_experiment": "Hash circuit+parameters, verify cache hits",
+          "evidence": "Loop structures detected alongside QPU calls \u2014 caching may eliminate redundant submissions",
+          "affected_nodes": [],
+          "estimated_saving_factor": null,
+          "metadata": {}
+        },
+        {
+          "transformation_id": "T09",
+          "transformation_name": "Graph/Problem Preprocessing",
+          "guarantee_class": "exact",
+          "confidence": "medium",
+          "what_detected": "NetworkX graph operations detected alongside quantum workload",
+          "why_expensive": "Graph optimization problems may contain trivially reducible components",
+          "alternative": "Apply classical graph preprocessing: component reduction, symmetry, sparsification, isolated-node removal",
+          "estimated_qpu_saving": "Reduces problem size \u2014 savings depend on graph structure",
+          "required_local_compute": "Classical graph analysis (NetworkX)",
+          "expected_quality_risk": "None \u2014 preprocessing preserves exact problem structure",
+          "validation_experiment": "Verify reduced graph produces same optimal solution",
+          "evidence": "NetworkX detected \u2014 graph preprocessing can reduce QPU workload",
+          "affected_nodes": [],
+          "estimated_saving_factor": null,
+          "metadata": {}
+        }
+      ],
+      "projected_reduction": "Variable \u2014 depends on workload structure",
+      "guarantee_classes": [
+        "EXACT"
+      ],
+      "assumptions": [
+        "All transformations are mathematically exact"
+      ],
+      "uncertainty": "low"
+    },
+    {
+      "name": "BALANCED",
+      "description": "EXACT + EQUIVALENT + low-risk APPROXIMATE transformations. Requires user-configured tolerance \u03b5.",
+      "recommendations": [
+        {
+          "transformation_id": "T04",
+          "transformation_name": "Shot Reduction Opportunity",
+          "guarantee_class": "approximate",
+          "confidence": "medium",
+          "what_detected": "Uniform high shot budget: 2000 shots per circuit",
+          "why_expensive": "Total shots: 2000 across 1 measurement calls",
+          "alternative": "Subsample existing bitstrings at reduced shot counts, compare metrics",
+          "estimated_qpu_saving": "2-10x reduction (e.g., 2000 -> 500 shots)",
+          "required_local_compute": "Classical subsampling and variance analysis",
+          "expected_quality_risk": "Increased estimator variance \u2014 requires tolerance configuration",
+          "validation_experiment": "Subsample at 2000, 1000, 500 shots, compare task metric within 95% CI",
+          "evidence": "Shot budget of 2000 may be higher than necessary for convergence",
+          "affected_nodes": [],
+          "estimated_saving_factor": 4.0,
+          "metadata": {}
+        },
+        {
+          "transformation_id": "T08",
+          "transformation_name": "Repeated-Circuit Caching",
+          "guarantee_class": "exact",
+          "confidence": "low",
+          "what_detected": "Loops detected that may resubmit identical circuits",
+          "why_expensive": "Identical circuits submitted multiple times to QPU",
+          "alternative": "Cache results for identical circuit+parameter combinations",
+          "estimated_qpu_saving": "Eliminates redundant QPU submissions entirely",
+          "required_local_compute": "Hash storage for circuit+parameter keys",
+          "expected_quality_risk": "None \u2014 cached results are identical",
+          "validation_experiment": "Hash circuit+parameters, verify cache hits",
+          "evidence": "Loop structures detected alongside QPU calls \u2014 caching may eliminate redundant submissions",
+          "affected_nodes": [],
+          "estimated_saving_factor": null,
+          "metadata": {}
+        },
+        {
+          "transformation_id": "T09",
+          "transformation_name": "Graph/Problem Preprocessing",
+          "guarantee_class": "exact",
+          "confidence": "medium",
+          "what_detected": "NetworkX graph operations detected alongside quantum workload",
+          "why_expensive": "Graph optimization problems may contain trivially reducible components",
+          "alternative": "Apply classical graph preprocessing: component reduction, symmetry, sparsification, isolated-node removal",
+          "estimated_qpu_saving": "Reduces problem size \u2014 savings depend on graph structure",
+          "required_local_compute": "Classical graph analysis (NetworkX)",
+          "expected_quality_risk": "None \u2014 preprocessing preserves exact problem structure",
+          "validation_experiment": "Verify reduced graph produces same optimal solution",
+          "evidence": "NetworkX detected \u2014 graph preprocessing can reduce QPU workload",
+          "affected_nodes": [],
+          "estimated_saving_factor": null,
+          "metadata": {}
+        }
+      ],
+      "projected_reduction": "4.0x projected reduction",
+      "guarantee_classes": [
+        "EXACT",
+        "EQUIVALENT",
+        "APPROXIMATE"
+      ],
+      "assumptions": [
+        "User must configure tolerance \u03b5 for APPROXIMATE transformations"
+      ],
+      "uncertainty": "medium"
+    },
+    {
+      "name": "AGGRESSIVE",
+      "description": "All transformations including EXPERIMENTAL. Always show uncertainty.",
+      "recommendations": [
+        {
+          "transformation_id": "T04",
+          "transformation_name": "Shot Reduction Opportunity",
+          "guarantee_class": "approximate",
+          "confidence": "medium",
+          "what_detected": "Uniform high shot budget: 2000 shots per circuit",
+          "why_expensive": "Total shots: 2000 across 1 measurement calls",
+          "alternative": "Subsample existing bitstrings at reduced shot counts, compare metrics",
+          "estimated_qpu_saving": "2-10x reduction (e.g., 2000 -> 500 shots)",
+          "required_local_compute": "Classical subsampling and variance analysis",
+          "expected_quality_risk": "Increased estimator variance \u2014 requires tolerance configuration",
+          "validation_experiment": "Subsample at 2000, 1000, 500 shots, compare task metric within 95% CI",
+          "evidence": "Shot budget of 2000 may be higher than necessary for convergence",
+          "affected_nodes": [],
+          "estimated_saving_factor": 4.0,
+          "metadata": {}
+        },
+        {
+          "transformation_id": "T08",
+          "transformation_name": "Repeated-Circuit Caching",
+          "guarantee_class": "exact",
+          "confidence": "low",
+          "what_detected": "Loops detected that may resubmit identical circuits",
+          "why_expensive": "Identical circuits submitted multiple times to QPU",
+          "alternative": "Cache results for identical circuit+parameter combinations",
+          "estimated_qpu_saving": "Eliminates redundant QPU submissions entirely",
+          "required_local_compute": "Hash storage for circuit+parameter keys",
+          "expected_quality_risk": "None \u2014 cached results are identical",
+          "validation_experiment": "Hash circuit+parameters, verify cache hits",
+          "evidence": "Loop structures detected alongside QPU calls \u2014 caching may eliminate redundant submissions",
+          "affected_nodes": [],
+          "estimated_saving_factor": null,
+          "metadata": {}
+        },
+        {
+          "transformation_id": "T09",
+          "transformation_name": "Graph/Problem Preprocessing",
+          "guarantee_class": "exact",
+          "confidence": "medium",
+          "what_detected": "NetworkX graph operations detected alongside quantum workload",
+          "why_expensive": "Graph optimization problems may contain trivially reducible components",
+          "alternative": "Apply classical graph preprocessing: component reduction, symmetry, sparsification, isolated-node removal",
+          "estimated_qpu_saving": "Reduces problem size \u2014 savings depend on graph structure",
+          "required_local_compute": "Classical graph analysis (NetworkX)",
+          "expected_quality_risk": "None \u2014 preprocessing preserves exact problem structure",
+          "validation_experiment": "Verify reduced graph produces same optimal solution",
+          "evidence": "NetworkX detected \u2014 graph preprocessing can reduce QPU workload",
+          "affected_nodes": [],
+          "estimated_saving_factor": null,
+          "metadata": {}
+        }
+      ],
+      "projected_reduction": "4.0x projected reduction",
+      "guarantee_classes": [
+        "EXACT",
+        "EQUIVALENT",
+        "APPROXIMATE",
+        "EXPERIMENTAL"
+      ],
+      "assumptions": [
+        "Experimental transformations require hardware validation"
+      ],
+      "uncertainty": "high"
+    }
+  ],
+  "all_recommendations": [
+    {
+      "transformation_id": "T04",
+      "transformation_name": "Shot Reduction Opportunity",
+      "guarantee_class": "approximate",
+      "confidence": "medium",
+      "what_detected": "Uniform high shot budget: 2000 shots per circuit",
+      "why_expensive": "Total shots: 2000 across 1 measurement calls",
+      "alternative": "Subsample existing bitstrings at reduced shot counts, compare metrics",
+      "estimated_qpu_saving": "2-10x reduction (e.g., 2000 -> 500 shots)",
+      "required_local_compute": "Classical subsampling and variance analysis",
+      "expected_quality_risk": "Increased estimator variance \u2014 requires tolerance configuration",
+      "validation_experiment": "Subsample at 2000, 1000, 500 shots, compare task metric within 95% CI",
+      "evidence": "Shot budget of 2000 may be higher than necessary for convergence",
+      "affected_nodes": [],
+      "estimated_saving_factor": 4.0,
+      "metadata": {}
+    },
+    {
+      "transformation_id": "T08",
+      "transformation_name": "Repeated-Circuit Caching",
+      "guarantee_class": "exact",
+      "confidence": "low",
+      "what_detected": "Loops detected that may resubmit identical circuits",
+      "why_expensive": "Identical circuits submitted multiple times to QPU",
+      "alternative": "Cache results for identical circuit+parameter combinations",
+      "estimated_qpu_saving": "Eliminates redundant QPU submissions entirely",
+      "required_local_compute": "Hash storage for circuit+parameter keys",
+      "expected_quality_risk": "None \u2014 cached results are identical",
+      "validation_experiment": "Hash circuit+parameters, verify cache hits",
+      "evidence": "Loop structures detected alongside QPU calls \u2014 caching may eliminate redundant submissions",
+      "affected_nodes": [],
+      "estimated_saving_factor": null,
+      "metadata": {}
+    },
+    {
+      "transformation_id": "T09",
+      "transformation_name": "Graph/Problem Preprocessing",
+      "guarantee_class": "exact",
+      "confidence": "medium",
+      "what_detected": "NetworkX graph operations detected alongside quantum workload",
+      "why_expensive": "Graph optimization problems may contain trivially reducible components",
+      "alternative": "Apply classical graph preprocessing: component reduction, symmetry, sparsification, isolated-node removal",
+      "estimated_qpu_saving": "Reduces problem size \u2014 savings depend on graph structure",
+      "required_local_compute": "Classical graph analysis (NetworkX)",
+      "expected_quality_risk": "None \u2014 preprocessing preserves exact problem structure",
+      "validation_experiment": "Verify reduced graph produces same optimal solution",
+      "evidence": "NetworkX detected \u2014 graph preprocessing can reduce QPU workload",
+      "affected_nodes": [],
+      "estimated_saving_factor": null,
+      "metadata": {}
+    }
+  ]
+}

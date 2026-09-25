@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WestQuant QCSC Optimizer — Audit Report</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 900px; margin: 2em auto; padding: 0 1em; color: #333; }
+h1 { color: #1a1a2e; border-bottom: 2px solid #16213e; padding-bottom: 0.3em; }
+h2 { color: #16213e; margin-top: 1.5em; }
+h3 { color: #0f3460; }
+code { background: #f4f4f4; padding: 0.1em 0.3em; border-radius: 3px; }
+blockquote { border-left: 4px solid #16213e; margin: 1em 0; padding: 0.5em 1em; background: #f8f8f8; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+th, td { border: 1px solid #ddd; padding: 0.5em; text-align: left; }
+th { background: #16213e; color: white; }
+.exact { color: #2d6a4f; font-weight: bold; }
+.approximate { color: #e76f51; font-weight: bold; }
+.experimental { color: #9d4edd; font-weight: bold; }
+</style>
+</head>
+<body>
+<h1>WestQuant QCSC Optimizer — Audit Report</h1>
+
+<blockquote>Use the QPU only where the QPU is actually needed.</blockquote>
+
+<h2>Executive Summary</h2>
+
+<ul>
+<li>Frameworks detected: networkx, qiskit</li>
+<li>Quantum boundaries detected: 0</li>
+<li>Circuits detected: 0</li>
+<li>Observables detected: 0</li>
+<li>Loops detected: 0</li>
+<li>QPU-saving opportunities: 3 (2 EXACT)</li>
+</ul>
+
+<h2>Frameworks Detected</h2>
+
+<ul>
+<li>networkx</li>
+<li>qiskit</li>
+</ul>
+
+<h2>Workflow Map</h2>
+
+<ul>
+<li>Total nodes: 18</li>
+<li>Quantum nodes: 2</li>
+<li>Classical nodes: 16</li>
+<li>Edges: 17</li>
+</ul>
+
+<h2>Quantum Boundaries</h2>
+
+<ul>
+<li>[QPU] unknown at /Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:13</li>
+<li>[QPU] unknown at /Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:14</li>
+<li>[QPU] unknown at /Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:15</li>
+<li>[QPU] unknown at /Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:15</li>
+<li>[QPU] unknown at /Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:15</li>
+<li>[QPU] generate_preset_pass_manager at /Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:55</li>
+<li>[QPU] sampler.run at /Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:69</li>
+<li>Shots: 2000</li>
+</ul>
+
+<h2>Baseline Quantum Workload</h2>
+
+<ul>
+<li>n_circuits: 1</li>
+<li>n_qpu_jobs: 1120000</li>
+<li>n_measurement_settings: 1</li>
+<li>shots_per_circuit: 2000</li>
+<li>total_shots: 2240000000</li>
+<li>max_qubits: 0</li>
+<li>loop_multiplier: 1120000</li>
+<li>certainty: estimated</li>
+<li>note: Costs are estimated from static analysis. Runtime values may differ.</li>
+</ul>
+
+<h2>QPU-Saving Opportunities</h2>
+
+<h3>Opportunity 1: Shot Reduction Opportunity</h3>
+
+<p><strong>Guarantee:</strong> [APPROXIMATE]</p>
+<p><strong>Confidence:</strong> MEDIUM</p>
+
+<p><strong>What was detected:</strong> Uniform high shot budget: 2000 shots per circuit</p>
+<p><strong>Why it's expensive:</strong> Total shots: 2000 across 1 measurement calls</p>
+<p><strong>Alternative:</strong> Subsample existing bitstrings at reduced shot counts, compare metrics</p>
+<p><strong>Projected QPU saving:</strong> 2-10x reduction (e.g., 2000 -> 500 shots)</p>
+<p><strong>Required local compute:</strong> Classical subsampling and variance analysis</p>
+<p><strong>Expected quality risk:</strong> Increased estimator variance — requires tolerance configuration</p>
+<p><strong>Validation:</strong> Subsample at 2000, 1000, 500 shots, compare task metric within 95% CI</p>
+<p><strong>Evidence:</strong> Shot budget of 2000 may be higher than necessary for convergence</p>
+
+<h3>Opportunity 2: Repeated-Circuit Caching</h3>
+
+<p><strong>Guarantee:</strong> [EXACT]</p>
+<p><strong>Confidence:</strong> LOW</p>
+
+<p><strong>What was detected:</strong> Loops detected that may resubmit identical circuits</p>
+<p><strong>Why it's expensive:</strong> Identical circuits submitted multiple times to QPU</p>
+<p><strong>Alternative:</strong> Cache results for identical circuit+parameter combinations</p>
+<p><strong>Projected QPU saving:</strong> Eliminates redundant QPU submissions entirely</p>
+<p><strong>Required local compute:</strong> Hash storage for circuit+parameter keys</p>
+<p><strong>Expected quality risk:</strong> None — cached results are identical</p>
+<p><strong>Validation:</strong> Hash circuit+parameters, verify cache hits</p>
+<p><strong>Evidence:</strong> Loop structures detected alongside QPU calls — caching may eliminate redundant submissions</p>
+
+<h3>Opportunity 3: Graph/Problem Preprocessing</h3>
+
+<p><strong>Guarantee:</strong> [EXACT]</p>
+<p><strong>Confidence:</strong> MEDIUM</p>
+
+<p><strong>What was detected:</strong> NetworkX graph operations detected alongside quantum workload</p>
+<p><strong>Why it's expensive:</strong> Graph optimization problems may contain trivially reducible components</p>
+<p><strong>Alternative:</strong> Apply classical graph preprocessing: component reduction, symmetry, sparsification, isolated-node removal</p>
+<p><strong>Projected QPU saving:</strong> Reduces problem size — savings depend on graph structure</p>
+<p><strong>Required local compute:</strong> Classical graph analysis (NetworkX)</p>
+<p><strong>Expected quality risk:</strong> None — preprocessing preserves exact problem structure</p>
+<p><strong>Validation:</strong> Verify reduced graph produces same optimal solution</p>
+<p><strong>Evidence:</strong> NetworkX detected — graph preprocessing can reduce QPU workload</p>
+
+<h2>Recommended Plans</h2>
+
+<h3>SAFE</h3>
+<p>Variable — depends on workload structure</p>
+
+<p>Only EXACT transformations. Mathematical result preserved.</p>
+<p>Transformations: 2</p>
+<p>Assumptions:</p>
+<ul>
+<li>All transformations are mathematically exact</li>
+</ul>
+<p>Uncertainty: low</p>
+
+<h3>BALANCED</h3>
+<p>4.0x projected reduction</p>
+
+<p>EXACT + EQUIVALENT + low-risk APPROXIMATE transformations. Requires user-configured tolerance ε.</p>
+<p>Transformations: 3</p>
+<p>Assumptions:</p>
+<ul>
+<li>User must configure tolerance ε for APPROXIMATE transformations</li>
+</ul>
+<p>Uncertainty: medium</p>
+
+<h3>AGGRESSIVE</h3>
+<p>4.0x projected reduction</p>
+
+<p>All transformations including EXPERIMENTAL. Always show uncertainty.</p>
+<p>Transformations: 3</p>
+<p>Assumptions:</p>
+<ul>
+<li>Experimental transformations require hardware validation</li>
+</ul>
+<p>Uncertainty: high</p>
+
+<h2>Uncertainty and Assumptions</h2>
+
+<ul>
+<li>This is an advisory-only report. No code was modified.</li>
+<li>Cost estimates are based on static analysis and may differ from runtime values.</li>
+<li>Composition of transformations does not simply multiply savings.</li>
+<li>Experimental transformations require hardware validation.</li>
+</ul>
+
+</body>
+</html>

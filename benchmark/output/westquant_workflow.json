@@ -1,0 +1,607 @@
+{
+  "schema_version": "wq-flow-ir-v0.1",
+  "graph": {
+    "nodes": [
+      {
+        "node_id": "n0001",
+        "operation_type": "classical_compute",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "import"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:13",
+        "metadata": {
+          "module": "qiskit",
+          "names": [
+            "QuantumCircuit"
+          ]
+        }
+      },
+      {
+        "node_id": "n0002",
+        "operation_type": "classical_compute",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "import"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:14",
+        "metadata": {
+          "module": "qiskit.quantum_info",
+          "names": [
+            "SparsePauliOp"
+          ]
+        }
+      },
+      {
+        "node_id": "n0003",
+        "operation_type": "classical_compute",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "import"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:15",
+        "metadata": {
+          "module": "qiskit_ibm_runtime",
+          "names": [
+            "Sampler",
+            "Estimator",
+            "Session"
+          ]
+        }
+      },
+      {
+        "node_id": "n0004",
+        "operation_type": "classical_compute",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "import"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:16",
+        "metadata": {
+          "module": "qiskit.transpiler",
+          "names": [
+            "generate_preset_pass_manager"
+          ]
+        }
+      },
+      {
+        "node_id": "n0005",
+        "operation_type": "parameter_sweep",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "loop"
+        ],
+        "repeat_count": 10000,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:20",
+        "metadata": {
+          "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:20",
+          "type": "for",
+          "count": 10000
+        }
+      },
+      {
+        "node_id": "n0006",
+        "operation_type": "parameter_sweep",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "loop"
+        ],
+        "repeat_count": 8,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:45",
+        "metadata": {
+          "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:45",
+          "type": "for",
+          "count": 8
+        }
+      },
+      {
+        "node_id": "n0007",
+        "operation_type": "parameter_sweep",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "loop"
+        ],
+        "repeat_count": 7,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:50",
+        "metadata": {
+          "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:50",
+          "type": "for",
+          "count": 7
+        }
+      },
+      {
+        "node_id": "n0008",
+        "operation_type": "parameter_sweep",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "loop"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:63",
+        "metadata": {
+          "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:63",
+          "type": "for"
+        }
+      },
+      {
+        "node_id": "n0009",
+        "operation_type": "parameter_sweep",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "loop"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:75",
+        "metadata": {
+          "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:75",
+          "type": "for",
+          "iter_var": "results"
+        }
+      },
+      {
+        "node_id": "n0010",
+        "operation_type": "parameter_sweep",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "loop"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:29",
+        "metadata": {
+          "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:29",
+          "type": "for"
+        }
+      },
+      {
+        "node_id": "n0011",
+        "operation_type": "parameter_sweep",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "loop"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:32",
+        "metadata": {
+          "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:32",
+          "type": "for"
+        }
+      },
+      {
+        "node_id": "n0012",
+        "operation_type": "qpu_sample",
+        "framework": "qiskit",
+        "resource_type": "quantum",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {
+          "shots": "unknown"
+        },
+        "resource_requirements": {},
+        "semantic_tags": [
+          "qpu_boundary"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:55",
+        "metadata": {
+          "call": "generate_preset_pass_manager",
+          "is_simulator": false
+        }
+      },
+      {
+        "node_id": "n0013",
+        "operation_type": "parameter_sweep",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "loop"
+        ],
+        "repeat_count": 2,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:68",
+        "metadata": {
+          "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:68",
+          "type": "for",
+          "count": 2
+        }
+      },
+      {
+        "node_id": "n0014",
+        "operation_type": "load_graph",
+        "framework": "networkx",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "graph"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:21",
+        "metadata": {}
+      },
+      {
+        "node_id": "n0015",
+        "operation_type": "build_circuit",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {
+          "n_qubits": "unknown"
+        },
+        "resource_requirements": {},
+        "semantic_tags": [
+          "circuit_construction"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:27",
+        "metadata": {}
+      },
+      {
+        "node_id": "n0016",
+        "operation_type": "parameter_sweep",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "loop"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:34",
+        "metadata": {
+          "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:34",
+          "type": "for"
+        }
+      },
+      {
+        "node_id": "n0017",
+        "operation_type": "parameter_sweep",
+        "framework": "qiskit",
+        "resource_type": "classical",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {},
+        "resource_requirements": {},
+        "semantic_tags": [
+          "loop"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:39",
+        "metadata": {
+          "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:39",
+          "type": "for"
+        }
+      },
+      {
+        "node_id": "n0018",
+        "operation_type": "qpu_sample",
+        "framework": "qiskit",
+        "resource_type": "quantum",
+        "inputs": [],
+        "outputs": [],
+        "estimated_cost": {
+          "shots": 2000
+        },
+        "resource_requirements": {},
+        "semantic_tags": [
+          "qpu_boundary"
+        ],
+        "repeat_count": 1,
+        "dependency_ids": [],
+        "source_location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:69",
+        "metadata": {
+          "call": "sampler.run",
+          "is_simulator": false
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source_id": "n0001",
+        "target_id": "n0002",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0002",
+        "target_id": "n0003",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0003",
+        "target_id": "n0004",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0004",
+        "target_id": "n0005",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0005",
+        "target_id": "n0006",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0006",
+        "target_id": "n0007",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0007",
+        "target_id": "n0008",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0008",
+        "target_id": "n0009",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0009",
+        "target_id": "n0010",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0010",
+        "target_id": "n0011",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0011",
+        "target_id": "n0012",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0012",
+        "target_id": "n0013",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0013",
+        "target_id": "n0014",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0014",
+        "target_id": "n0015",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0015",
+        "target_id": "n0016",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0016",
+        "target_id": "n0017",
+        "edge_type": "data_flow",
+        "metadata": {}
+      },
+      {
+        "source_id": "n0017",
+        "target_id": "n0018",
+        "edge_type": "data_flow",
+        "metadata": {}
+      }
+    ],
+    "frameworks_detected": [
+      "networkx",
+      "qiskit"
+    ],
+    "metadata": {
+      "n_quantum_boundaries": 7,
+      "n_circuits": 1,
+      "n_observables": 0,
+      "n_loops": 10,
+      "n_shots_detected": 1
+    }
+  },
+  "summary": {
+    "frameworks_detected": [
+      "networkx",
+      "qiskit"
+    ],
+    "quantum_boundaries": [
+      {
+        "type": "import",
+        "object": "QuantumCircuit",
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:13"
+      },
+      {
+        "type": "import",
+        "object": "SparsePauliOp",
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:14"
+      },
+      {
+        "type": "import",
+        "object": "Sampler",
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:15"
+      },
+      {
+        "type": "import",
+        "object": "Estimator",
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:15"
+      },
+      {
+        "type": "import",
+        "object": "Session",
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:15"
+      },
+      {
+        "type": "qpu_call",
+        "call": "generate_preset_pass_manager",
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:55",
+        "shots": null,
+        "is_simulator": false
+      },
+      {
+        "type": "qpu_call",
+        "call": "sampler.run",
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:69",
+        "shots": 2000,
+        "is_simulator": false
+      }
+    ],
+    "circuits": [
+      {
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:27",
+        "n_qubits": null
+      }
+    ],
+    "observables": [],
+    "loops": [
+      {
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:20",
+        "type": "for",
+        "count": 10000
+      },
+      {
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:45",
+        "type": "for",
+        "count": 8
+      },
+      {
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:50",
+        "type": "for",
+        "count": 7
+      },
+      {
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:63",
+        "type": "for"
+      },
+      {
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:75",
+        "type": "for",
+        "iter_var": "results"
+      },
+      {
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:29",
+        "type": "for"
+      },
+      {
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:32",
+        "type": "for"
+      },
+      {
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:68",
+        "type": "for",
+        "count": 2
+      },
+      {
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:34",
+        "type": "for"
+      },
+      {
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:39",
+        "type": "for"
+      }
+    ],
+    "shots_detected": [
+      {
+        "location": "/Users/davidvesterlund/freedomcode/freedomcode/westquant/qcsc/benchmark/maxcut_project/maxcut_qaoa.py:69",
+        "shots": 2000,
+        "call": "sampler.run"
+      }
+    ],
+    "backends": [],
+    "n_nodes": 18
+  }
+}
