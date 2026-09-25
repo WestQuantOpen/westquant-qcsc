@@ -1,4 +1,4 @@
-"""Tests for the WestQuant QCSC Optimizer."""
+"""Tests for the WestQuant QCSC Optimizer — all phases."""
 import json
 import tempfile
 from pathlib import Path
@@ -18,10 +18,18 @@ from qcsc.resource_model import (
     is_qpu_backend, QPUBackend, ResourceCertainty,
 )
 from qcsc.analyzer.qiskit_analyzer import QiskitAnalyzer
+from qcsc.analyzer.pennylane_analyzer import PennyLaneAnalyzer
+from qcsc.analyzer.pytket_analyzer import PytketAnalyzer
+from qcsc.analyzer.pulser_analyzer import PulserAnalyzer
+from qcsc.analyzer.multi_framework import MultiFrameworkAnalyzer
 from qcsc.detectors import run_all_detectors
 from qcsc.planner import build_plans
 from qcsc.cost_model import estimate_baseline_cost
 from qcsc.reporting import write_reports
+from qcsc.patch_generator import generate_patches, write_patch_file
+from qcsc.runner import run_plan
+from qcsc.closed_loop import ClosedLoopTracker
+from qcsc.learned_policy import LearnedPolicy
 
 
 class TestFlowIR:
@@ -90,18 +98,17 @@ class TestTransformationRegistry:
 
 class TestResourceModel:
     def test_statevector_memory(self):
-        # 20 qubits = 16 * 2^20 bytes = ~16 MB
         mem = statevector_memory_gb(20)
-        assert 0.01 < mem < 0.02  # ~16 MB
+        assert 0.01 < mem < 0.02
 
     def test_statevector_feasibility(self):
-        assert is_statevector_feasible(10)  # 10 qubits is feasible
-        assert not is_statevector_feasible(40)  # 40 qubits is not
+        assert is_statevector_feasible(10)
+        assert not is_statevector_feasible(40)
 
     def test_is_qpu_backend(self):
-        assert is_qpu_backend("ibm_kyiv")  # real QPU
-        assert not is_qpu_backend("aer_simulator")  # simulator
-        assert not is_qpu_backend("fake_provider")  # fake
+        assert is_qpu_backend("ibm_kyiv")
+        assert not is_qpu_backend("aer_simulator")
+        assert not is_qpu_backend("fake_provider")
 
 
 class TestQiskitAnalyzer:
@@ -114,7 +121,6 @@ class TestQiskitAnalyzer:
         assert "qiskit" in graph.frameworks_detected
         assert "networkx" in graph.frameworks_detected
         assert len(graph.nodes) > 0
-        # Should detect quantum boundaries
         summary = analyzer.get_summary()
         assert len(summary["quantum_boundaries"]) > 0
 
@@ -125,7 +131,6 @@ class TestQiskitAnalyzer:
             assert len(graph.nodes) == 0
 
     def test_detect_shots(self):
-        # Create a simple Python file with shots
         with tempfile.TemporaryDirectory() as tmpdir:
             p = Path(tmpdir) / "test.py"
             p.write_text("""
@@ -138,6 +143,130 @@ job = sampler.run([circuit], shots=4096)
             summary = analyzer.get_summary()
             assert len(summary["shots_detected"]) > 0
             assert summary["shots_detected"][0]["shots"] == 4096
+
+
+class TestPennyLaneAnalyzer:
+    def test_detect_pennylane(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            p = Path(tmpdir) / "test.py"
+            p.write_text("""
+import pennylane as qml
+import numpy as np
+
+dev = qml.device("default.qubit", wires=4, shots=1024)
+
+@qml.qnode(dev)
+def circuit(x):
+    qml.RX(x, wires=0)
+    qml.CNOT(wires=[0, 1])
+    return qml.expval(qml.PauliZ(0))
+
+for i in range(100):
+    result = circuit(0.5)
+""")
+            analyzer = PennyLaneAnalyzer()
+            graph = analyzer.analyze_project(tmpdir)
+            assert "pennylane" in graph.frameworks_detected
+            summary = analyzer.get_summary()
+            assert len(summary["quantum_boundaries"]) > 0
+            assert len(summary["devices"]) > 0
+
+    def test_detect_shots(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            p = Path(tmpdir) / "test.py"
+            p.write_text("""
+import pennylane as qml
+dev = qml.device("default.qubit", wires=2, shots=2048)
+""")
+            analyzer = PennyLaneAnalyzer()
+            graph = analyzer.analyze_project(tmpdir)
+            summary = analyzer.get_summary()
+            assert len(summary["devices"]) > 0
+            assert summary["devices"][0]["name"] == "default.qubit"
+
+
+class TestPytketAnalyzer:
+    def test_detect_pytket(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            p = Path(tmpdir) / "test.py"
+            p.write_text("""
+from pytket import Circuit
+from pytket.backends import AerBackend
+
+c = Circuit(4)
+c.H(0)
+c.CX(0, 1)
+
+backend = AerBackend()
+result = backend.run_circuit(c, n_shots=1000)
+""")
+            analyzer = PytketAnalyzer()
+            graph = analyzer.analyze_project(tmpdir)
+            assert "pytket" in graph.frameworks_detected
+            summary = analyzer.get_summary()
+            assert len(summary["circuits"]) > 0
+
+    def test_detect_n_shots(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            p = Path(tmpdir) / "test.py"
+            p.write_text("""
+from pytket import Circuit
+from pytket.backends import AerBackend
+backend = AerBackend()
+result = backend.run_circuit(c, n_shots=5000)
+""")
+            analyzer = PytketAnalyzer()
+            graph = analyzer.analyze_project(tmpdir)
+            summary = analyzer.get_summary()
+            assert len(summary["shots_detected"]) > 0
+            assert summary["shots_detected"][0]["shots"] == 5000
+
+
+class TestPulserAnalyzer:
+    def test_detect_pulser(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            p = Path(tmpdir) / "test.py"
+            p.write_text("""
+from pulser import Pulse, Sequence, Register
+from pulser.waveforms import ConstantWaveform
+
+reg = Register.square(4, spacing=5.0)
+seq = Sequence(reg)
+seq.declare_channel("ch0", "rydberg_global")
+pulse = Pulse.ConstantPulse(1000, 5.0, 0.0, 0)
+seq.add(pulse, "ch0")
+
+sim = seq.simulate()
+""")
+            analyzer = PulserAnalyzer()
+            graph = analyzer.analyze_project(tmpdir)
+            assert "pulser" in graph.frameworks_detected
+            summary = analyzer.get_summary()
+            assert len(summary["circuits"]) > 0
+
+    def test_detect_register(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            p = Path(tmpdir) / "test.py"
+            p.write_text("""
+from pulser import Register
+reg = Register.from_coordinates([(0,0), (5,0), (10,0)])
+""")
+            analyzer = PulserAnalyzer()
+            graph = analyzer.analyze_project(tmpdir)
+            summary = analyzer.get_summary()
+            assert "pulser" in summary["frameworks_detected"]
+
+
+class TestMultiFrameworkAnalyzer:
+    def test_multi_framework(self):
+        project = Path(__file__).parent.parent / "benchmark" / "maxcut_project"
+        if not project.exists():
+            pytest.skip("benchmark project not found")
+        analyzer = MultiFrameworkAnalyzer()
+        graph, summary = analyzer.analyze_project(project)
+        assert "qiskit" in summary["frameworks_detected"]
+        assert "networkx" in summary["frameworks_detected"]
+        assert len(graph.nodes) > 0
 
 
 class TestDetectors:
@@ -153,10 +282,8 @@ class TestDetectors:
         graph = WorkflowGraph()
         recs = run_all_detectors(summary, graph)
         assert len(recs) > 0
-        # Should detect shot reduction
         rec_ids = [r.transformation_id for r in recs]
         assert "T04" in rec_ids
-        # Should detect graph preprocessing
         assert "T09" in rec_ids
 
 
@@ -183,11 +310,11 @@ class TestPlanner:
         plans = build_plans(recs)
         assert len(plans) == 3
         assert plans[0].name == "SAFE"
-        assert len(plans[0].recommendations) == 1  # only EXACT
+        assert len(plans[0].recommendations) == 1
         assert plans[1].name == "BALANCED"
-        assert len(plans[1].recommendations) == 2  # EXACT + APPROXIMATE
+        assert len(plans[1].recommendations) == 2
         assert plans[2].name == "AGGRESSIVE"
-        assert len(plans[2].recommendations) == 2  # all
+        assert len(plans[2].recommendations) == 2
 
 
 class TestCostModel:
@@ -210,11 +337,8 @@ class TestReporting:
     def test_write_reports(self):
         summary = {
             "frameworks_detected": ["qiskit"],
-            "quantum_boundaries": [],
-            "circuits": [],
-            "observables": [],
-            "loops": [],
-            "shots_detected": [],
+            "quantum_boundaries": [], "circuits": [], "observables": [],
+            "loops": [], "shots_detected": [],
         }
         graph = WorkflowGraph()
         graph.frameworks_detected = ["qiskit"]
@@ -227,6 +351,215 @@ class TestReporting:
             assert paths["html"].exists()
             assert paths["plan"].exists()
             assert paths["workflow"].exists()
-            # Verify JSON is valid
             plan_data = json.loads(paths["plan"].read_text())
             assert plan_data["schema_version"] == "wq-qcsc-plan-v0.1"
+
+
+class TestPatchGenerator:
+    def test_generate_patches(self):
+        project = Path(__file__).parent.parent / "benchmark" / "maxcut_project"
+        if not project.exists():
+            pytest.skip("benchmark project not found")
+        recs = [
+            Recommendation(
+                transformation_id="T04", transformation_name="Shot Reduction",
+                guarantee_class=GuaranteeClass.APPROXIMATE, confidence=Confidence.MEDIUM,
+                what_detected="2000 shots", why_expensive="high cost", alternative="reduce",
+                estimated_qpu_saving="4x", required_local_compute="none",
+                expected_quality_risk="low", validation_experiment="subsample",
+                evidence="high shots",
+            ),
+            Recommendation(
+                transformation_id="T09", transformation_name="Graph Preprocessing",
+                guarantee_class=GuaranteeClass.EXACT, confidence=Confidence.MEDIUM,
+                what_detected="NetworkX", why_expensive="large graphs", alternative="preprocess",
+                estimated_qpu_saving="variable", required_local_compute="NetworkX",
+                expected_quality_risk="none", validation_experiment="verify",
+                evidence="graph structure",
+            ),
+        ]
+        graph = WorkflowGraph()
+        summary = {"quantum_boundaries": [{"location": str(project / "maxcut_qaoa.py") + ":1"}]}
+        patches = generate_patches(project, recs, graph, summary)
+        assert len(patches) == 2
+        assert patches[0].recommendation_id == "T04"
+        assert patches[1].recommendation_id == "T09"
+
+    def test_write_patch_file(self):
+        from qcsc.patch_generator import ProposedPatch
+        patches = [ProposedPatch(
+            patch_id="p000", recommendation_id="T01",
+            file_path="test.py", description="test patch",
+            guarantee_class=GuaranteeClass.EXACT,
+            original_lines=["old"], proposed_lines=["new"],
+        )]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = write_patch_file(patches, tmpdir)
+            assert path.exists()
+            assert "test patch" in path.read_text()
+
+
+class TestRunner:
+    def test_dry_run(self):
+        project = Path(__file__).parent.parent / "benchmark" / "maxcut_project"
+        if not project.exists():
+            pytest.skip("benchmark project not found")
+        plan_data = {
+            "schema_version": "wq-qcsc-plan-v0.1",
+            "plans": [{
+                "name": "SAFE", "description": "test",
+                "recommendations": [{
+                    "transformation_id": "T09",
+                    "transformation_name": "Graph Preprocessing",
+                    "guarantee_class": "exact",
+                    "confidence": "medium",
+                    "what_detected": "test", "why_expensive": "test",
+                    "alternative": "test", "estimated_qpu_saving": "2x",
+                    "required_local_compute": "none", "expected_quality_risk": "none",
+                    "validation_experiment": "test", "evidence": "test",
+                }],
+                "projected_reduction": "2x", "guarantee_classes": ["EXACT"],
+                "assumptions": [], "uncertainty": "low",
+            }],
+            "all_recommendations": [],
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            plan_path = Path(tmpdir) / "plan.json"
+            plan_path.write_text(json.dumps(plan_data))
+            result = run_plan(plan_path, project, output_dir=tmpdir, dry_run=True, auto_confirm=True)
+            assert result.success
+            assert result.plan_name == "SAFE"
+
+
+class TestClosedLoop:
+    def test_prediction_and_observation(self):
+        tracker = ClosedLoopTracker()
+        tracker.record_prediction(
+            "rec001", "T04", "Shot Reduction", "approximate",
+            predicted_saving=4.0, predicted_quality_effect="increased_variance",
+            problem_family="QAOA", hardware="ibm_kyiv",
+        )
+        tracker.record_observation(
+            "rec001", actual_saving=3.5, actual_quality_effect="increased_variance",
+            success=True,
+        )
+        report = tracker.generate_report()
+        assert report["total_predictions"] == 1
+        assert report["total_observations"] == 1
+        assert report["successful"] == 1
+        assert report["mean_prediction_error"] == 0.5
+        assert report["quality_prediction_accuracy"] == 1.0
+
+    def test_save_and_load(self):
+        tracker = ClosedLoopTracker()
+        tracker.record_prediction("r1", "T01", "Bases", "exact", 2.0)
+        tracker.record_observation("r1", 2.0, "none", True)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = tracker.save(Path(tmpdir) / "data.jsonl")
+            assert path.exists()
+            tracker2 = ClosedLoopTracker()
+            tracker2.load(path)
+            assert len(tracker2.records) == 1
+            assert "r1" in tracker2.records
+
+    def test_export_training_data(self):
+        tracker = ClosedLoopTracker()
+        tracker.record_prediction("r1", "T04", "Shots", "approximate", 4.0,
+                                   workflow_state={"n_qubits": 8})
+        tracker.record_observation("r1", 3.5, "increased_variance", True)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = tracker.export_training_data(Path(tmpdir) / "train.jsonl")
+            assert path.exists()
+            data = json.loads(path.read_text().strip())
+            assert data["schema_version"] == "wq-qcsc-training-v0.1"
+            assert data["input"]["transformation_id"] == "T04"
+            assert data["output"]["actual_saving"] == 3.5
+
+
+class TestLearnedPolicy:
+    def test_rank_transformations(self):
+        recs = [
+            Recommendation(
+                transformation_id="T01", transformation_name="Redundant Bases",
+                guarantee_class=GuaranteeClass.EXACT, confidence=Confidence.HIGH,
+                what_detected="test", why_expensive="test", alternative="test",
+                estimated_qpu_saving="2x", required_local_compute="none",
+                expected_quality_risk="none", validation_experiment="test",
+                evidence="test", estimated_saving_factor=2.0,
+            ),
+            Recommendation(
+                transformation_id="T04", transformation_name="Shot Reduction",
+                guarantee_class=GuaranteeClass.APPROXIMATE, confidence=Confidence.MEDIUM,
+                what_detected="test", why_expensive="test", alternative="test",
+                estimated_qpu_saving="4x", required_local_compute="none",
+                expected_quality_risk="low", validation_experiment="test",
+                evidence="test", estimated_saving_factor=4.0,
+            ),
+        ]
+        graph = WorkflowGraph()
+        summary = {"frameworks_detected": ["qiskit"]}
+        policy = LearnedPolicy()
+        plan = policy.rank_transformations(recs, graph, summary, plan_type="balanced")
+        assert len(plan.decisions) == 2
+        # T01 (EXACT, HIGH confidence, 2x) should rank higher than T04 (APPROXIMATE, MEDIUM, 4x)
+        # because EXACT guarantee + HIGH confidence outweighs higher saving factor
+        assert plan.decisions[0].transformation_id == "T01"
+        assert plan.decisions[0].rank == 1
+        assert plan.total_predicted_saving > 1.0
+
+    def test_safe_plan_excludes_approximate(self):
+        recs = [
+            Recommendation(
+                transformation_id="T04", transformation_name="Shot Reduction",
+                guarantee_class=GuaranteeClass.APPROXIMATE, confidence=Confidence.HIGH,
+                what_detected="test", why_expensive="test", alternative="test",
+                estimated_qpu_saving="4x", required_local_compute="none",
+                expected_quality_risk="low", validation_experiment="test",
+                evidence="test", estimated_saving_factor=4.0,
+            ),
+        ]
+        graph = WorkflowGraph()
+        summary = {"frameworks_detected": ["qiskit"]}
+        policy = LearnedPolicy()
+        plan = policy.rank_transformations(recs, graph, summary, plan_type="safe")
+        # Safe plan should not recommend APPROXIMATE
+        assert all(not d.recommended for d in plan.decisions)
+
+    def test_policy_explanation(self):
+        recs = [
+            Recommendation(
+                transformation_id="T01", transformation_name="Bases",
+                guarantee_class=GuaranteeClass.EXACT, confidence=Confidence.HIGH,
+                what_detected="test", why_expensive="test", alternative="test",
+                estimated_qpu_saving="2x", required_local_compute="none",
+                expected_quality_risk="none", validation_experiment="test",
+                evidence="test", estimated_saving_factor=2.0,
+            ),
+        ]
+        graph = WorkflowGraph()
+        summary = {"frameworks_detected": ["qiskit"]}
+        policy = LearnedPolicy()
+        plan = policy.rank_transformations(recs, graph, summary, plan_type="safe")
+        assert len(plan.explanation) > 0
+        assert "EXACT" in plan.explanation or "exact" in plan.explanation
+
+    def test_save_plan(self):
+        recs = [
+            Recommendation(
+                transformation_id="T01", transformation_name="Bases",
+                guarantee_class=GuaranteeClass.EXACT, confidence=Confidence.HIGH,
+                what_detected="test", why_expensive="test", alternative="test",
+                estimated_qpu_saving="2x", required_local_compute="none",
+                expected_quality_risk="none", validation_experiment="test",
+                evidence="test", estimated_saving_factor=2.0,
+            ),
+        ]
+        graph = WorkflowGraph()
+        summary = {"frameworks_detected": ["qiskit"]}
+        policy = LearnedPolicy()
+        plan = policy.rank_transformations(recs, graph, summary)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = policy.save_plan(plan, Path(tmpdir) / "policy.json")
+            assert path.exists()
+            data = json.loads(path.read_text())
+            assert data["schema_version"] == "wq-qcsc-policy-v0.1"
