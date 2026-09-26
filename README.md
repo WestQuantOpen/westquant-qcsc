@@ -1,6 +1,25 @@
+<div align="center">
+
 # WestQuant QCSC Optimizer
 
-> Use the QPU only where the QPU is actually needed.
+### Use the QPU only where the QPU is actually needed.
+
+**Semantic QPU Minimization for hybrid quantum-classical workflows.**
+
+</div>
+
+---
+
+<div align="center">
+
+[![PyPI](https://img.shields.io/pypi/v/westquant-qcsc)](https://pypi.org/project/westquant-qcsc/)
+[![Python](https://img.shields.io/badge/python-3.10+-blue)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/licenses/MIT)
+[![Discussions](https://img.shields.io/badge/discussions-join%20us-blue)](https://github.com/orgs/WestQuantOpen/discussions)
+
+</div>
+
+---
 
 An open-source, software-agnostic analyzer and optimizer for hybrid quantum-classical projects. The system inspects a user's quantum codebase and answers:
 
@@ -14,29 +33,19 @@ WestQuant solves the deeper problem: **Should task T require a QPU at all?**
 
 This is **Semantic QPU Minimization**.
 
-## V0.1 — Advisory Only
-
-V0.1 performs static analysis + cost estimation + recommendations. It does NOT:
-- modify user code
-- execute user code
-- submit jobs to hardware
-- automatically rewrite experiments
-
-## Quick Start
+## Quick start
 
 ```bash
-# Install
-pip install -e .
-
-# Audit a project
-westquant audit ./my_quantum_project
-
-# Specify output directory
-westquant audit ./my_quantum_project -o ./reports
+pip install westquant-qcsc
 ```
 
-## Output
+### Audit a project
 
+```bash
+westquant audit ./my_quantum_project
+```
+
+Output:
 ```
 westquant_report.html    # Full HTML report
 westquant_report.md      # Markdown report
@@ -44,7 +53,54 @@ westquant_plan.json      # Machine-readable plan (SAFE/BALANCED/AGGRESSIVE)
 westquant_workflow.json  # WQFlow IR graph
 ```
 
-## What It Detects
+### QPU Budget Predictor
+
+Estimate the required QPU budget from problem structure — before any quantum execution:
+
+```python
+from qcsc import QPUBudgetPredictor, ProblemProfile
+
+profile = ProblemProfile(
+    problem="MaxCut",
+    n_qubits=16,
+    p=3,
+    graph_family="GEO",
+    quality_target=0.95,
+)
+predictor = QPUBudgetPredictor()
+budget = predictor.estimate(profile)
+
+print(f"Shots: {budget.recommended_shots:,}")
+print(f"Reduction vs naive: {budget.reduction_vs_naive:.0f}x")
+print(f"Estimated quality: {budget.estimated_quality:.4f}")
+print(f"Strategies: {budget.strategies}")
+```
+
+Or from the CLI:
+
+```bash
+westquant budget --problem MaxCut --qubits 16 --depth 3 --family GEO --compare
+```
+
+Output:
+```
+  [B0_naive]
+    Shots:         2,119,680
+    Est. quality:  0.9961
+
+  [B1_best_practice]
+    Shots:         1,024
+    Est. quality:  0.9961
+    vs naive:      2070.0x reduction
+
+  [B2_classical]
+    Shots:         0
+    Est. quality:  1.0000
+```
+
+The predictor is calibrated from 12,600 exact simulation results across 6 problems, 7 graph families, and depths p=1,2,3. See [Paper A](https://github.com/WestQuantOpen/qpu-mini) for the underlying research.
+
+## What it detects
 
 | ID | Transformation | Guarantee | Description |
 |----|---------------|-----------|-------------|
@@ -64,7 +120,7 @@ westquant_workflow.json  # WQFlow IR graph
 | T14 | Circuit Architecture Reduction | EXACT | Remove mathematically redundant gates |
 | T15 | Quantum/Classical Decomposition | EQUIVALENT | Split quantum sampling from classical post-processing |
 
-## Three Plans
+## Three plans
 
 - **SAFE**: Only EXACT transformations. Mathematical result preserved.
 - **BALANCED**: EXACT + EQUIVALENT + low-risk APPROXIMATE. Requires tolerance ε.
@@ -74,27 +130,46 @@ westquant_workflow.json  # WQFlow IR graph
 
 ```
 qcsc/
-├── flow_ir/              # WQFlow IR — directed graph of hybrid workflows
-├── resource_model/       # QPU backend + local compute capabilities
-├── transformation_registry/  # 15 QPU-saving transformations (T01-T15)
-├── analyzer/             # Framework-specific source analysis (Qiskit first)
-├── detectors/            # Detectors that produce recommendations
-├── planner/              # Pareto planner (SAFE/BALANCED/AGGRESSIVE)
-├── reporting/            # HTML + Markdown + JSON report generation
-├── benchmark/            # Benchmark projects with known opportunities
-├── experiments/          # Validation experiment protocols
-├── rfc/                  # RFC specifications
-└── tests/                # Test suite
+├── qpu_budget.py              # QPU budget predictor (Paper A integration)
+├── flow_ir/                    # WQFlow IR — directed graph of hybrid workflows
+├── resource_model/             # QPU backend + local compute capabilities
+├── transformation_registry/    # 15 QPU-saving transformations (T01-T15)
+├── analyzer/                   # Framework-specific source analysis (Qiskit first)
+├── detectors/                  # Detectors that produce recommendations
+├── planner/                    # Pareto planner (SAFE/BALANCED/AGGRESSIVE)
+├── reporting/                  # HTML + Markdown + JSON report generation
+├── benchmark/                  # Benchmark projects with known opportunities
+├── cost_model.py               # QPU cost estimation
+├── closed_loop.py              # Closed-loop measurement tracking
+├── learned_policy.py           # Learned policy for transformation ranking
+├── patch_generator.py         # Advisory patch generation
+├── runner.py                   # Supervised plan execution
+└── cli.py                      # CLI entry point
 ```
 
-## Design Philosophy
+## Design philosophy
 
 WestQuant asks three questions in order:
-1. Does this operation need to happen?
-2. Does it need to be quantum?
-3. Only then: which resource should execute it?
+
+1. **Does this operation need to happen?** (Eliminate)
+2. **Does it need to be quantum?** (Replace with classical)
+3. **Only then: which resource should execute it?** (Schedule)
 
 That ordering is the defining idea of the project.
+
+## V0.1 — Advisory only
+
+V0.1 performs static analysis + cost estimation + recommendations. It does NOT:
+- modify user code
+- execute user code
+- submit jobs to hardware
+- automatically rewrite experiments
+
+## Community
+
+- **Discussions:** [Join the conversation](https://github.com/orgs/WestQuantOpen/discussions)
+- **Contributing:** See [CONTRIBUTING.md](https://github.com/WestQuantOpen/.github/blob/main/CONTRIBUTING.md)
+- **Code of Conduct:** See [CODE_OF_CONDUCT.md](https://github.com/WestQuantOpen/.github/blob/main/CODE_OF_CONDUCT.md)
 
 ## License
 
