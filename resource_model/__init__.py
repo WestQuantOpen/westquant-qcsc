@@ -136,6 +136,21 @@ def detect_local_resources() -> LocalResourceModel:
     return model
 
 
+def cudaq_capability_records(*, cudaq_available: bool, gpu_memory_gb: float = 0.0) -> list[dict[str, Any]]:
+    records = [
+        {"backend_id": "qpp-cpu", "provider": "NVIDIA CUDA-Q", "resource": "cpu", "engine": "statevector", "available": True},
+        {"backend_id": "nvidia", "provider": "NVIDIA CUDA-Q", "resource": "gpu", "engine": "statevector", "available": cudaq_available},
+        {"backend_id": "tensornet", "provider": "NVIDIA CUDA-Q", "resource": "gpu", "engine": "tensor_network", "available": cudaq_available},
+        {"backend_id": "cudensitymat", "provider": "NVIDIA cuQuantum", "resource": "gpu", "engine": "density_matrix", "available": cudaq_available},
+        {"backend_id": "cupauliprop", "provider": "NVIDIA cuQuantum", "resource": "gpu", "engine": "pauli_propagation", "available": cudaq_available},
+        {"backend_id": "custabilizer", "provider": "NVIDIA cuQuantum", "resource": "gpu", "engine": "stabilizer", "available": cudaq_available},
+    ]
+    for record in records:
+        if record["resource"] == "gpu":
+            record["gpu_memory_gb"] = gpu_memory_gb
+    return records
+
+
 # Simulation feasibility thresholds
 STATEVECTOR_MAX_QUBITS_CPU = 28  # ~16GB for complex128
 STATEVECTOR_MAX_QUBITS_GPU = 30  # ~32GB for complex128 on GPU

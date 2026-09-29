@@ -157,6 +157,14 @@ WestQuant asks three questions in order:
 
 That ordering is the defining idea of the project.
 
+## CUDA-Q and cuQuantum
+
+Version 0.1.1 adds advisory capability records for CUDA-Q CPU/GPU targets and
+cuStateVec, cuTensorNet, cuDensityMat, cuPauliProp, and cuStabilizer. Install
+`westquant-qcsc[cudaq]` to compose QPU minimization with `westquant-cudaq`.
+The integration is domain-neutral and does not include vertical-specific
+scientific methods.
+
 ## V0.1 — Advisory only
 
 V0.1 performs static analysis + cost estimation + recommendations. It does NOT:

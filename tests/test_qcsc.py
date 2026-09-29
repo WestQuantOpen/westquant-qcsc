@@ -15,7 +15,7 @@ from qcsc.transformation_registry import (
 )
 from qcsc.resource_model import (
     statevector_memory_gb, is_statevector_feasible,
-    is_qpu_backend, QPUBackend, ResourceCertainty,
+    is_qpu_backend, QPUBackend, ResourceCertainty, cudaq_capability_records,
 )
 from qcsc.analyzer.qiskit_analyzer import QiskitAnalyzer
 from qcsc.analyzer.pennylane_analyzer import PennyLaneAnalyzer
@@ -563,3 +563,10 @@ class TestLearnedPolicy:
             assert path.exists()
             data = json.loads(path.read_text())
             assert data["schema_version"] == "wq-qcsc-policy-v0.1"
+
+
+def test_cudaq_capability_records_are_advisory():
+    records = cudaq_capability_records(cudaq_available=False, gpu_memory_gb=24.0)
+    assert records[0]["backend_id"] == "qpp-cpu"
+    assert records[0]["available"]
+    assert not next(record for record in records if record["backend_id"] == "nvidia")["available"]

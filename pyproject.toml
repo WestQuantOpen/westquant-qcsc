@@ -4,17 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "westquant-qcsc"
-version = "0.1.0a1"
+version = "0.1.1"
 description = "WestQuant QCSC Optimizer — Semantic QPU Minimization for hybrid quantum-classical workflows"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 requires-python = ">=3.10"
 authors = [{name = "WestQuant Open"}]
 keywords = ["quantum", "qpu", "optimization", "hybrid", "quantum-classical", "resource-planning"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -24,13 +23,24 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
+cudaq = ["westquant-cudaq>=0.1.0"]
 test = ["pytest>=7"]
 
 [project.scripts]
 westquant = "qcsc.cli:main"
 
-[tool.setuptools.packages.find]
-where = ["."]
+[tool.setuptools]
+package-dir = {qcsc = "."}
+packages = [
+    "qcsc",
+    "qcsc.analyzer",
+    "qcsc.detectors",
+    "qcsc.flow_ir",
+    "qcsc.planner",
+    "qcsc.reporting",
+    "qcsc.resource_model",
+    "qcsc.transformation_registry",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["qcsc/tests"]
