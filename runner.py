@@ -1,7 +1,7 @@
 """Supervised runner — executes approved plans with explicit user approval.
 
 Usage:
-    westquant run plan.json
+    westquant-qcsc run plan.json
 
 V0.1 does NOT automatically execute code. It:
 1. Reads an approved plan

@@ -39,10 +39,16 @@ This is **Semantic QPU Minimization**.
 pip install westquant-qcsc
 ```
 
+> **Command renamed in 0.2.0.** The console command is now `westquant-qcsc`.
+> Versions 0.1.x installed it as `westquant`, which collided with the
+> `westquant` umbrella package's own command. Replace `westquant audit|propose|run|policy|closed-loop`
+> with `westquant-qcsc …`; subcommands and options are unchanged. If you keep
+> 0.1.x, do not install it alongside the `westquant` package.
+
 ### Audit a project
 
 ```bash
-westquant audit ./my_quantum_project
+westquant-qcsc audit ./my_quantum_project
 ```
 
 Output:
@@ -79,7 +85,7 @@ print(f"Strategies: {budget.strategies}")
 Or from the CLI:
 
 ```bash
-westquant budget --problem MaxCut --qubits 16 --depth 3 --family GEO --compare
+westquant-qcsc budget --problem MaxCut --qubits 16 --depth 3 --family GEO --compare
 ```
 
 Output:

@@ -570,3 +570,10 @@ def test_cudaq_capability_records_are_advisory():
     assert records[0]["backend_id"] == "qpp-cpu"
     assert records[0]["available"]
     assert not next(record for record in records if record["backend_id"] == "nvidia")["available"]
+
+
+def test_console_script_does_not_claim_umbrella_westquant_command():
+    from importlib.metadata import distribution
+
+    scripts = {ep.name for ep in distribution("westquant-qcsc").entry_points if ep.group == "console_scripts"}
+    assert scripts == {"westquant-qcsc"}
