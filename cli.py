@@ -1,12 +1,12 @@
 """WestQuant QCSC Optimizer — CLI entry point.
 
 Commands:
-    westquant audit .                  # audit current directory
-    westquant audit ./project          # audit specific project
-    westquant propose .                # generate proposed patches (advisory)
-    westquant run plan.json             # run approved plan (supervised)
-    westquant policy .                  # generate learned policy plan
-    westquant closed-loop               # manage closed-loop measurement data
+    westquant-qcsc audit .                  # audit current directory
+    westquant-qcsc audit ./project          # audit specific project
+    westquant-qcsc propose .                # generate proposed patches (advisory)
+    westquant-qcsc run plan.json             # run approved plan (supervised)
+    westquant-qcsc policy .                  # generate learned policy plan
+    westquant-qcsc closed-loop               # manage closed-loop measurement data
 """
 from __future__ import annotations
 
@@ -127,7 +127,7 @@ def cmd_propose(args: argparse.Namespace) -> int:
     print(f"  JSON file:  {output_path / 'westquant_patches.json'}")
     print()
     print("  Advisory only — review patches before applying.")
-    print("  Use 'westquant run plan.json' to apply in supervised mode.")
+    print("  Use 'westquant-qcsc run plan.json' to apply in supervised mode.")
 
     return 0
 
@@ -235,7 +235,7 @@ def cmd_closed_loop(args: argparse.Namespace) -> int:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        prog="westquant",
+        prog="westquant-qcsc",
         description="WestQuant QCSC Optimizer — Semantic QPU Minimization",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)

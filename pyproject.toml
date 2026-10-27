@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "westquant-qcsc"
-version = "0.1.1"
+version = "0.2.0"
 description = "WestQuant QCSC Optimizer — Semantic QPU Minimization for hybrid quantum-classical workflows"
 readme = "README.md"
 license = "MIT"
@@ -27,7 +27,7 @@ cudaq = ["westquant-cudaq>=0.1.0"]
 test = ["pytest>=7"]
 
 [project.scripts]
-westquant = "qcsc.cli:main"
+westquant-qcsc = "qcsc.cli:main"
 
 [tool.setuptools]
 package-dir = {qcsc = "."}

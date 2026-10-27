@@ -1,7 +1,7 @@
 """Patch generator — generates proposed code patches but does NOT apply them.
 
 Usage:
-    westquant propose .
+    westquant-qcsc propose .
 
 Generates a patch file with suggested code changes for each recommendation.
 The user must review and apply patches manually.
